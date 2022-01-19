@@ -22,8 +22,8 @@ data:
       - job_name: 'prisma-compute'
         scheme: 'https'
         static_configs:
-        - targets: ['CONSOLE_URL:8083']
-        metrics_path: /api/v1/metrics
+        - targets: ['CONSOLE_URL:8083'] # For the SaaS console, you will not use port 8083, change to 443 and use your own tenant host name
+        metrics_path: /api/v1/metrics   # You may need to prepend this path with something unique to your console especially if using SaaS console (e.g. us-#-#######)
         basic_auth:
-          username: 'USER'
-          password: 'PASS'
+          username: 'USER'    # For SaaS console, you can use accessKey here
+          password: 'PASS'    # For SaaS console, you can use secretKey here
