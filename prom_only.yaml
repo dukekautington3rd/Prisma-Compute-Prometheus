@@ -28,7 +28,7 @@ spec:
   volumes:
     - name: prometheus-vol
       hostPath:
-        path: /home/lkaut/datamounts/prometheus
+        path: /datamounts/prometheus
     - name: prometheus-conf
       configMap:
         name: prometheus-conf
