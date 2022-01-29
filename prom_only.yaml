@@ -6,6 +6,8 @@ metadata:
   labels:
     app: prometheus
 spec:
+  nodeSelector:
+    kubernetes.io/hostname: jonsnow
   dnsConfig:
     options:
       - name: ndots
