@@ -27,6 +27,17 @@ spec:
         mountPath: /etc/prometheus/prometheus.yml
         subPath: prometheus.yml
         readOnly: true
+  - name: prometheus-sup-client
+    image: dukekautington/prisma_cloud_prometheus_client_supplemental:1667516996 
+    imagePullPolicy: Always
+    envFrom:
+    - configMapRef:
+        name: prom-sup-env
+    ports:
+      - name: prometheus8000
+        hostPort: 8000
+        containerPort: 8000
+        protocol: TCP
   volumes:
     - name: prometheus-vol
       hostPath:

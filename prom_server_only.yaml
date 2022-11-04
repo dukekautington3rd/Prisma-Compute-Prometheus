@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prisma-prometheus
+  namespace: prisma-metrics
+  labels:
+    app: prometheus
+spec:
+  dnsConfig:
+    options:
+      - name: ndots
+        value: "1"
+  containers:
+  - name: prometheus
+    image: prom/prometheus
+    ports:
+      - name: prometheus9090
+        hostPort: 9090
+        containerPort: 9090
+        protocol: TCP
+    volumeMounts:
+      - name: prometheus-vol
+        mountPath: /prometheus
+      - name: prometheus-conf
+        mountPath: /etc/prometheus/prometheus.yml
+        subPath: prometheus.yml
+        readOnly: true
+  volumes:
+    - name: prometheus-vol
+      hostPath:
+        path: /datamounts/prometheus
+    - name: prometheus-conf
+      configMap:
+        name: prometheus-conf
+        items:
+          - key: prometheus.yml
+            path: prometheus.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: prisma-metrics
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - protocol: TCP
+      name: prometheus9090
+      port: 9090
+      targetPort: 9090

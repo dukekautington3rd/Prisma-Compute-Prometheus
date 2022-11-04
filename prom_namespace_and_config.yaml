@@ -22,8 +22,24 @@ data:
       - job_name: 'prisma-compute'
         scheme: 'https'
         static_configs:
-        - targets: ['CONSOLE_URL:8083'] # For the SaaS console, you will not use port 8083, change to 443 and use your own tenant host name
-        metrics_path: /api/v1/metrics   # You may need to prepend this path with something unique to your console especially if using SaaS console (e.g. us-#-#######)
+        - targets: ['us-west1.cloud.twistlock.com:443']
+        metrics_path: /us-1-123456789/api/v1/metrics
         basic_auth:
-          username: 'USER'    # For SaaS console, you can use accessKey here
-          password: 'PASS'    # For SaaS console, you can use secretKey here
+          username: ''
+          password: ''
+      - job_name: 'prisma-supplemental'
+        scheme: 'http'
+        static_configs:
+        - targets: ['localhost:8000']
+        metrics_path: /
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: prisma-metrics
+  name: prom-sup-env
+data:
+  api_compute: ""
+  pc_username: ""
+  pc_password: ""
