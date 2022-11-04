@@ -73,8 +73,8 @@ def get_data():
 
 
 # Create a metric to track time spent and requests made.
-total_assets = Gauge('total_assets', 'Total Assets', ['credentialId','account', 'provider', 'region', 'service'])
-defended_assets = Gauge('defended_assets', 'Defended Assets', ['credentialId','account', 'provider', 'region', 'service'])
+pcc_total_assets = Gauge('pcc_total_assets', 'Total Assets', ['credentialId','account', 'provider', 'region', 'service'])
+pcc_defended_assets = Gauge('pcc_defended_assets', 'Defended Assets', ['credentialId','account', 'provider', 'region', 'service'])
 
 
 if __name__ == '__main__':
@@ -84,6 +84,6 @@ if __name__ == '__main__':
         token, url = authenticate()
         data = get_data()
         for i in data:
-          total_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['total'])
-          defended_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['defended'])
+          pcc_total_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['total'])
+          pcc_defended_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['defended'])
         time.sleep(60)
