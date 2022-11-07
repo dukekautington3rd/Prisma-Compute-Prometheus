@@ -40,6 +40,6 @@ metadata:
   namespace: prisma-metrics
   name: prom-sup-env
 data:
-  api_compute: ""
-  pc_username: ""
-  pc_password: ""
+  api_compute: "data"
+  pc_username: "data"
+  pc_password: "data"

@@ -21,6 +21,14 @@ jobs:
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
     - name: Build the Docker image
       run: docker build ./prometheus_supplemental_client/ --tag dukekautington/prisma_cloud_prometheus_client_supplemental:$(date +%y.%m.%d.%k) --tag dukekautington/prisma_cloud_prometheus_client_supplemental:latest
+    - name: Prisma Cloud image scan
+      id: scan
+      uses: PaloAltoNetworks/prisma-cloud-scan@v1
+      with:
+        pcc_console_url: ${{ secrets.PCC_CONSOLE_URL }}
+        pcc_user: ${{ secrets.PCC_USER }}
+        pcc_pass: ${{ secrets.PCC_PASS }}
+        image_name: dukekautington/prisma_cloud_prometheus_client_supplemental:latest
     - name: Publish the Docker image
       run: docker push -a dukekautington/prisma_cloud_prometheus_client_supplemental
     - name: Logout of Docker Hub
