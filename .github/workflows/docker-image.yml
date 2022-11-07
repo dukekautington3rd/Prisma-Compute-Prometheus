@@ -14,6 +14,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Run Bridgecrew 
+      id: Bridgecrew
+      uses: bridgecrewio/bridgecrew-action@master
+      with:
+        api-key: ${{ secrets.PCC_USER }}"::"${{ secrets.PCC_PASS }}
+        #directory: "example/examplea"
+        #check: CKV_AWS_1 # optional: run only a specific check_id. can be comma separated list
+        #skip_check: CKV_AWS_1 # optional: skip a specific check_id. can be comma separated list
+        soft_fail: true
+        #framework: terraform # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
+        output_format: cli
+        quiet: false
+        external_checks_dir: ./checkov
+        download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
+        #log_level: DEBUG # optional: set log level. Default WARNING
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
