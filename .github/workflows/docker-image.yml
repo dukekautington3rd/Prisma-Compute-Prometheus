@@ -18,7 +18,7 @@ jobs:
       id: Bridgecrew
       uses: bridgecrewio/bridgecrew-action@master
       with:
-        api-key: ${{ secrets.PCC_USER }}"::"${{ secrets.PCC_PASS }}
+        api-key: ${{ secrets.PCC_USER }}::${{ secrets.PCC_PASS }}
         #directory: "example/examplea"
         #check: CKV_AWS_1 # optional: run only a specific check_id. can be comma separated list
         #skip_check: CKV_AWS_1 # optional: skip a specific check_id. can be comma separated list
