@@ -31,11 +31,6 @@ jobs:
         external_checks_dirs: ./checkov
         download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
         #log_level: DEBUG # optional: set log level. Default WARNING
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
     - name: Build the Docker image
       run: docker build ./prometheus_supplemental_client/ --tag dukekautington/prisma_cloud_prometheus_client_supplemental:$(date +%y.%m.%d.%k) --tag dukekautington/prisma_cloud_prometheus_client_supplemental:latest
     - name: Prisma Cloud image scan
@@ -46,7 +41,10 @@ jobs:
         pcc_user: ${{ secrets.PCC_USER }}
         pcc_pass: ${{ secrets.PCC_PASS }}
         image_name: dukekautington/prisma_cloud_prometheus_client_supplemental:latest
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
     - name: Publish the Docker image
       run: docker push -a dukekautington/prisma_cloud_prometheus_client_supplemental
-    - name: Logout of Docker Hub
-      run: docker logout
