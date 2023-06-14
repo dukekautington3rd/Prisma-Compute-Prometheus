@@ -38,7 +38,7 @@ def authenticate():
             try:
                 creds = find_creds()
                 rbody = {'username': creds['username'], 'password': creds['password']}
-                r = requests.post(f"https://{creds['api_compute']}/api/v1/authenticate", json = rbody)
+                r = requests.post(f"{creds['api_compute']}/api/v1/authenticate", json = rbody)
                 if r.status_code == 200:
                     succeed = True
                     print("New Auth")
@@ -54,18 +54,18 @@ def authenticate():
  
 
 
-def get_data():
+def get_data(token, url):
     succeed = False
     while not succeed:
         try:
             headers = {"Authorization": f"Bearer {token}"}
-            r = requests.get(f"https://{url}/api/v1/cloud/discovery", headers=headers)
+            r = requests.get(f"{url}/api/v1/cloud/discovery", headers=headers)
             if r.status_code == 200:
                 data = r.json()
                 succeed = True
                 return data
             else:
-                print(f"The error did not succeed.  Code {r.status_code}")
+                print(f"The data call did not succeed.  Code {r.status_code}")
                 raise ValueError('The API call did not succeed')
         except:
             time.sleep(300)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     start_http_server(8000)
     while True:
         token, url = authenticate()
-        data = get_data()
+        data = get_data(token, url)
         for i in data:
           pcc_total_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['total'])
           pcc_defended_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['defended'])
