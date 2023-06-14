@@ -54,7 +54,7 @@ jobs:
         echo "BUILD_ID=$(date +'%y_%m_%d')" >> $GITHUB_ENV
     - name: Lowercase the repo name for docker hub
       run: |
-        echo "BUILD_ID=$(date +'%y_%m_%d')" >> $GITHUB_ENV
+        echo "REPO=`echo $REPO | tr '[:upper:]' '[:lower:]'` >> $GITHUB_ENV
     - name: Build the Docker image
       # run: docker build -t "$DOCKER_USERNAME/$REPO:$(date +%y_%m_%d)" -t "$DOCKER_USERNAME/$REPO:latest" .
       run: docker build -t "$DOCKER_USERNAME/$REPO:$BUILD_ID" -t "$DOCKER_USERNAME/$REPO:latest" .
