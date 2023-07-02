@@ -13,6 +13,7 @@ env:
   PRISMA_USERNAME: ${{ secrets.PCC_USER }}
   PRISMA_PASSWORD: ${{ secrets.PCC_PASS }}
   PRISMA_API_URL: ${{ vars.PRISMA_API_URL }}
+  BUILD_DIR: "./prometheus_supplemental_client"
 
 jobs:
 
@@ -23,8 +24,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    # - name: establish repo variable
-    #   run: echo "REPO_NAME=${{ github.event.repository.name }}"  >> $GITHUB_ENV
+
     # - name: Dump github context
     #   run:   echo "$GITHUB_CONTEXT"
     #   shell: bash
@@ -55,9 +55,18 @@ jobs:
     - name: Lowercase the repo name for docker hub
       run: |
         echo "REPO=`echo $REPO | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
-    - name: Build the Docker image
-      # run: docker build -t "$DOCKER_USERNAME/$REPO:$(date +%y_%m_%d)" -t "$DOCKER_USERNAME/$REPO:latest" .
-      run: docker build -t "$DOCKER_USERNAME/$REPO:$BUILD_ID" -t "$DOCKER_USERNAME/$REPO:latest" ./prometheus_supplemental_client
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ env.DOCKER_TOKEN }}
+    - name: Build the Docker image for scanning purposes
+      run: |
+        docker build -t "$DOCKER_USERNAME/$REPO:$BUILD_ID" $BUILD_DIR
     - name: Prisma Cloud image scan
       id: scan
       uses: PaloAltoNetworks/prisma-cloud-scan@v1
@@ -65,13 +74,18 @@ jobs:
         pcc_console_url: ${{ secrets.PCC_CONSOLE_URL }}
         pcc_user: ${{ env.PRISMA_USERNAME }}
         pcc_pass: ${{ env.PRISMA_PASSWORD }}
-        image_name: ${{ env.DOCKER_USERNAME }}/${{ env.REPO }}
-    # - name: Run yor action
-    #   uses: bridgecrewio/yor-action@main
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
+        image_name: ${{ env.DOCKER_USERNAME }}/${{ env.REPO }}:${{env.BUILD_ID}}
+    - name: Run yor action
+      uses: bridgecrewio/yor-action@main
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
       with:
-        username: ${{ env.DOCKER_USERNAME }}
-        password: ${{ env.DOCKER_TOKEN }}
-    - name: Publish the Docker image
-      run: docker push -a ${{ env.DOCKER_USERNAME }}/${{ env.REPO }}
+        context: ${{env.BUILD_DIR}}  # Path to the Dockerfile and build context
+        platforms: linux/amd64,linux/arm64  # Specify the desired platforms
+        push: true 
+        tags: |
+            ${{env.DOCKER_USERNAME}}/${{env.REPO}}:${{env.BUILD_ID}}
+            ${{env.DOCKER_USERNAME}}/${{env.REPO}}:latest
+    # Not needed since it is pushed in the above step
+    # - name: Publish the Docker image
+    #   run: docker push -a ${{ env.DOCKER_USERNAME }}/${{ env.REPO }}
