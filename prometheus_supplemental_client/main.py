@@ -84,6 +84,10 @@ if __name__ == '__main__':
         token, url = authenticate()
         data = get_data(token, url)
         for i in data:
-          pcc_total_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['total'])
-          pcc_defended_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['defended'])
+            #below if statement helps avoid errors if there is a recently deleted account 
+            if ("err" not in i and "accountID" in i):
+                pcc_total_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['total'])
+                pcc_defended_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['defended'])
+            else:
+                continue
         time.sleep(60)
