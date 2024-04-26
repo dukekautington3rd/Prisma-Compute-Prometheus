@@ -12,7 +12,7 @@ def find_creds():
     # creds = {}
     try:
         if all(x in environ for x in ['api_compute', 'pc_username', 'pc_password']):
-            creds = {'api_compute': environ.get('api_compute'), 'username': environ.get('pc_username'), 'password': environ.get('pc_password')}
+            creds = {'api_cspm': environ.get('api_cspm'), 'api_compute': environ.get('api_compute'), 'username': environ.get('pc_username'), 'password': environ.get('pc_password')}
         elif exists("./credentials.json"):
             creds = json.load(open('./credentials.json'))
         elif exists("/credentials.json"):
@@ -24,7 +24,7 @@ def find_creds():
     return creds
 
 
-def authenticate():
+def authenticate_compute():
     # This first condition will help us not hit the authentication API for every iteration.
     global tokenBirthtime
     if (all(x in globals() for x in ['token', 'url'])) and (time.time() - tokenBirthtime < 3600):
@@ -54,7 +54,7 @@ def authenticate():
  
 
 
-def get_data(token, url):
+def get_compute_data(token, url):
     succeed = False
     while not succeed:
         try:
@@ -81,9 +81,9 @@ if __name__ == '__main__':
     # Start up the server to expose the metrics.
     start_http_server(8000)
     while True:
-        token, url = authenticate()
-        data = get_data(token, url)
-        for i in data:
+        token, url = authenticate_compute()
+        compute_data = get_compute_data(token, url)
+        for i in compute_data:
             #below if statement helps avoid errors if there is a recently deleted account 
             if ("err" not in i and "accountID" in i):
                 pcc_total_assets.labels(credentialId=i['credentialId'], account=i['accountID'], provider=i['provider'], region=i['region'], service=i['serviceType']).set(i['total'])
